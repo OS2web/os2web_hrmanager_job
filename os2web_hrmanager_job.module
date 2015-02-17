@@ -6,68 +6,6 @@
 
 include_once 'os2web_hrmanager_job.features.inc';
 
-define('OS2WEB_HRMANAGER_JOB_FEEDS_MACHINE_NAME', 'os2web_hr_manager_job');
-
-
-/**
- * Implements hook_menu().
- */
-function os2web_hrmanager_job_menu() {
-  $config_path = os2web_hrmanager_job_config_path();
-  $items = array();
-  $items[$config_path . '/os2web_hrmanager_jobs'] = array(
-    'title' => 'OS2Web HR-Manager Job',
-    'description' => 'Settings for the OS2Web HR-Manager Job importer.',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('os2web_hrmanager_job_settings_form'),
-    'access arguments' => array('administer os2web hrmanager job settings'),
-    'file' => 'os2web_hrmanager_job.admin.inc',
-  );
-  $items[$config_path . '/os2web_hrmanager_jobs/settings'] = array(
-    'title' => 'Settings',
-    'description' => 'Settings for the OS2Web HR-Manager Job importer.',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('os2web_hrmanager_job_settings_form'),
-    'access arguments' => array('administer os2web hrmanager job settings'),
-    'file' => 'os2web_hrmanager_job.admin.inc',
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-    'weight' => 1,
-  );
-  $items[$config_path . '/os2web_hrmanager_jobs/log'] = array(
-    'title' => 'Import log',
-    'description' => 'Log for the HR-Manager Job importer.',
-    'page callback' => 'os2web_hrmanager_job_log_view',
-    'access callback' => 'os2web_hrmanager_job_log_access',
-    'file' => 'os2web_hrmanager_job.admin.inc',
-    'type' => MENU_LOCAL_TASK,
-    'weight' => 2,
-  );
-  return $items;
-}
-
-/**
- * Implements hook_permission().
- */
-function os2web_hrmanager_job_permission() {
-  return array(
-    'administer os2web hrmanager job settings' => array(
-      'title' => t('Administer OS2Web HR-Manager Job settings'),
-      'description' => t('Administer settings for the OS2Web HR-Manager Job module.'),
-    ),
-  );
-}
-
-/**
- * Menu access callback.
- *
- * Checking access to the log tab on the settings page.
- */
-function os2web_hrmanager_job_log_access() {
-  if (user_access('administer feeds') && user_access("administer os2web hrmanager job settings")) {
-    return TRUE;
-  }
-  return FALSE;
-}
 
 /**
  * Return our custom formats.
@@ -169,53 +107,5 @@ function os2web_hrmanager_job_feeds_after_parse(FeedsSource $source, FeedsParser
     foreach ($result->items as &$item) {
       $item['xpathparser:1'] = os2web_hrmanager_job_clean_up_html($item['xpathparser:1']);
     }
-  }
-}
-
-/**
- * Find and return the existing feeds URL.
- *
- * @return string
- *   The feeds URL.
- */
-function os2web_hrmanager_job_feeds_url_get() {
-  $feeds_source = feeds_source(OS2WEB_HRMANAGER_JOB_FEEDS_MACHINE_NAME);
-  $feeds_config = $feeds_source->getConfigFor($feeds_source->importer->fetcher);
-  if (isset($feeds_config['source']) && !empty($feeds_config['source'])) {
-    return $feeds_config['source'];
-  }
-  else {
-    return '';
-  }
-}
-
-/**
- * Set and save the feeds URL.
- *
- * @param string $url
- *   The feeds URL.
- *
- * @return void
- */
-function os2web_hrmanager_job_feeds_url_set($url) {
-  $feeds_source = feeds_source(OS2WEB_HRMANAGER_JOB_FEEDS_MACHINE_NAME);
-  $feeds_config = $feeds_source->getConfigFor($feeds_source->importer->fetcher);
-  $feeds_config['source'] = $url;
-  $feeds_source->setConfigFor($feeds_source->importer->fetcher, $feeds_config);
-  $feeds_source->save();
-}
-
-/**
- * Find the config path.
- *
- * @return string
- *   The config path.
- */
-function os2web_hrmanager_job_config_path() {
-  if (module_exists('os2web_settings_page')) {
-    return 'admin/os2web_settings/services';
-  }
-  else {
-    return 'admin/config/services';
   }
 }
