@@ -40,5 +40,6 @@ function os2web_hrmanager_job_node_info() {
       'help' => '',
     ),
   );
+  drupal_alter('node_info', $items);
   return $items;
 }
