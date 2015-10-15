@@ -22,6 +22,7 @@ function os2web_hrmanager_job_settings_form($form, $form_state) {
     '#description' => t('Enter the feed source URL for the HR-Manager Job importer.'),
     '#default_value' => os2web_hrmanager_job_feeds_url_get(),
     '#size' => 60,
+	'#maxlength' => 255,
   );
   $form['settings']['save'] = array(
     '#type' => 'submit',
